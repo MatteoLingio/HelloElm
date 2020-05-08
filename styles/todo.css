@@ -13,6 +13,23 @@ body {
     text-decoration: line-through;
 }
 
+.footer{
+    width: 20%;
+    height: 20px;
+    padding: 10px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.footer-item{
+    margin-right: 10px;
+    cursor: pointer;
+}
+
+.footer-item_active{
+    text-decoration: underline;
+}
+
 .container {
   margin: 0;
   display: flex;

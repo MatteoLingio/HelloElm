@@ -15,31 +15,42 @@ type alias Task =
   , checked : Bool
   }
 type alias Model = 
-    { todoList : List Task
+    { allTasks : List Task
+     ,toDoList : List Task
+     ,doneList : List Task
      ,task : Task
+     ,viewSelected : String 
     }
 
 init : Model
-init = { todoList = []
+init = { allTasks = []
+        ,toDoList = []
+        ,doneList = []
         ,task = { text = ""
-                 , checked = False }  
+                 , checked = False }
+        ,viewSelected = "All"
        }
 
-type Msg = Add | ChangeTaskText String | ChangeCheck String
+type Msg = Add | ChangeTaskText String | ChangeCheck String | ChangeView String
 
 update : Msg -> Model -> Model
 update msg model = 
     case msg of 
         Add ->
            if model.task.text /= "" then
-            { task = { text = "", checked = False }
-            , todoList = model.todoList ++ [model.task] }
+            { model | task = { text = "", checked = False }
+            , allTasks = model.allTasks ++ [model.task]
+            , toDoList = model.toDoList ++ [model.task]}
            else
              model 
         ChangeTaskText text ->
            { model | task = { text = text, checked = False } } 
         ChangeCheck value ->
-           { model | todoList = List.map (\n -> checkList n value) model.todoList }
+           { model | allTasks = List.map (\n -> checkList n value) model.allTasks
+                    , doneList = model.doneList ++ List.filter(\n -> n.text == value) model.doneList
+                    , toDoList = List.filter(\n -> n.text /= value) model.toDoList }
+        ChangeView current -> 
+            { model | viewSelected = current }
 checkList: Task -> String -> Task
 
 checkList element val = 
@@ -50,8 +61,8 @@ checkList element val =
     else
         element
 
-createList: Task -> Html Msg
-createList task = 
+taskList: Task -> Html Msg
+taskList task = 
     li[][ div[class "task-container"][
         input[class "switch", type_ "checkbox", value task.text, onChange ChangeCheck ][]
         ,span[classList [
@@ -67,7 +78,19 @@ view model =
       ,button [ onClick Add ] [ text "Add Task" ]
       ,div[][]
       ,ul[]
-        (List.map createList model.todoList)
+        (if model.viewSelected == "All" then
+            List.map taskList model.allTasks
+        else if model.viewSelected == "ToDo" then
+            List.map taskList model.toDoList
+        else
+            List.map taskList model.doneList)
+      ,(if List.length model.allTasks > 0 then
+          div[class "footer"][
+          span[onClick (ChangeView "All"), classList [("footer-item", True), ("footer-item_active", model.viewSelected == "All")]][text "All"],
+          span[onClick (ChangeView "ToDo"), classList [("footer-item", True), ("footer-item_active", model.viewSelected == "ToDo")]][text "ToDo"],
+          span[onClick (ChangeView "Done"), classList [("footer-item", True), ("footer-item_active", model.viewSelected == "Done")]][text "Done"]
+        ] else 
+            div[][])
       ]
 
 

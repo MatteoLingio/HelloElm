@@ -4437,8 +4437,11 @@ var $elm$core$Basics$GT = {$: 'GT'};
 var $elm$core$Basics$LT = {$: 'LT'};
 var $elm$core$Basics$False = {$: 'False'};
 var $author$project$Main$init = {
+	allTasks: _List_Nil,
+	doneList: _List_Nil,
 	task: {checked: false, text: ''},
-	todoList: _List_Nil
+	toDoList: _List_Nil,
+	viewSelected: 'All'
 };
 var $elm$core$Result$Err = function (a) {
 	return {$: 'Err', a: a};
@@ -5177,56 +5180,6 @@ var $author$project$Main$checkList = F2(
 			element,
 			{checked: true}) : element);
 	});
-var $elm$core$Basics$neq = _Utils_notEqual;
-var $author$project$Main$update = F2(
-	function (msg, model) {
-		switch (msg.$) {
-			case 'Add':
-				return (model.task.text !== '') ? {
-					task: {checked: false, text: ''},
-					todoList: _Utils_ap(
-						model.todoList,
-						_List_fromArray(
-							[model.task]))
-				} : model;
-			case 'ChangeTaskText':
-				var text = msg.a;
-				return _Utils_update(
-					model,
-					{
-						task: {checked: false, text: text}
-					});
-			default:
-				var value = msg.a;
-				return _Utils_update(
-					model,
-					{
-						todoList: A2(
-							$elm$core$List$map,
-							function (n) {
-								return A2($author$project$Main$checkList, n, value);
-							},
-							model.todoList)
-					});
-		}
-	});
-var $author$project$Main$Add = {$: 'Add'};
-var $author$project$Main$ChangeTaskText = function (a) {
-	return {$: 'ChangeTaskText', a: a};
-};
-var $elm$html$Html$button = _VirtualDom_node('button');
-var $elm$json$Json$Encode$string = _Json_wrap;
-var $elm$html$Html$Attributes$stringProperty = F2(
-	function (key, string) {
-		return A2(
-			_VirtualDom_property,
-			key,
-			$elm$json$Json$Encode$string(string));
-	});
-var $elm$html$Html$Attributes$class = $elm$html$Html$Attributes$stringProperty('className');
-var $author$project$Main$ChangeCheck = function (a) {
-	return {$: 'ChangeCheck', a: a};
-};
 var $elm$core$List$filter = F2(
 	function (isGood, list) {
 		return A3(
@@ -5238,6 +5191,81 @@ var $elm$core$List$filter = F2(
 			_List_Nil,
 			list);
 	});
+var $elm$core$Basics$neq = _Utils_notEqual;
+var $author$project$Main$update = F2(
+	function (msg, model) {
+		switch (msg.$) {
+			case 'Add':
+				return (model.task.text !== '') ? _Utils_update(
+					model,
+					{
+						allTasks: _Utils_ap(
+							model.allTasks,
+							_List_fromArray(
+								[model.task])),
+						task: {checked: false, text: ''},
+						toDoList: _Utils_ap(
+							model.toDoList,
+							_List_fromArray(
+								[model.task]))
+					}) : model;
+			case 'ChangeTaskText':
+				var text = msg.a;
+				return _Utils_update(
+					model,
+					{
+						task: {checked: false, text: text}
+					});
+			case 'ChangeCheck':
+				var value = msg.a;
+				return _Utils_update(
+					model,
+					{
+						allTasks: A2(
+							$elm$core$List$map,
+							function (n) {
+								return A2($author$project$Main$checkList, n, value);
+							},
+							model.allTasks),
+						doneList: _Utils_ap(
+							model.doneList,
+							A2(
+								$elm$core$List$filter,
+								function (n) {
+									return _Utils_eq(n.text, value);
+								},
+								model.doneList)),
+						toDoList: A2(
+							$elm$core$List$filter,
+							function (n) {
+								return !_Utils_eq(n.text, value);
+							},
+							model.toDoList)
+					});
+			default:
+				var current = msg.a;
+				return _Utils_update(
+					model,
+					{viewSelected: current});
+		}
+	});
+var $author$project$Main$Add = {$: 'Add'};
+var $author$project$Main$ChangeTaskText = function (a) {
+	return {$: 'ChangeTaskText', a: a};
+};
+var $author$project$Main$ChangeView = function (a) {
+	return {$: 'ChangeView', a: a};
+};
+var $elm$html$Html$button = _VirtualDom_node('button');
+var $elm$json$Json$Encode$string = _Json_wrap;
+var $elm$html$Html$Attributes$stringProperty = F2(
+	function (key, string) {
+		return A2(
+			_VirtualDom_property,
+			key,
+			$elm$json$Json$Encode$string(string));
+	});
+var $elm$html$Html$Attributes$class = $elm$html$Html$Attributes$stringProperty('className');
 var $elm$core$Tuple$second = function (_v0) {
 	var y = _v0.b;
 	return y;
@@ -5254,7 +5282,6 @@ var $elm$html$Html$Attributes$classList = function (classes) {
 };
 var $elm$html$Html$div = _VirtualDom_node('div');
 var $elm$html$Html$input = _VirtualDom_node('input');
-var $elm$html$Html$li = _VirtualDom_node('li');
 var $elm$virtual_dom$VirtualDom$Normal = function (a) {
 	return {$: 'Normal', a: a};
 };
@@ -5265,6 +5292,25 @@ var $elm$html$Html$Events$on = F2(
 			$elm$virtual_dom$VirtualDom$on,
 			event,
 			$elm$virtual_dom$VirtualDom$Normal(decoder));
+	});
+var $elm$html$Html$Events$onClick = function (msg) {
+	return A2(
+		$elm$html$Html$Events$on,
+		'click',
+		$elm$json$Json$Decode$succeed(msg));
+};
+var $elm$html$Html$Events$alwaysStop = function (x) {
+	return _Utils_Tuple2(x, true);
+};
+var $elm$virtual_dom$VirtualDom$MayStopPropagation = function (a) {
+	return {$: 'MayStopPropagation', a: a};
+};
+var $elm$html$Html$Events$stopPropagationOn = F2(
+	function (event, decoder) {
+		return A2(
+			$elm$virtual_dom$VirtualDom$on,
+			event,
+			$elm$virtual_dom$VirtualDom$MayStopPropagation(decoder));
 	});
 var $elm$json$Json$Decode$field = _Json_decodeField;
 var $elm$json$Json$Decode$at = F2(
@@ -5277,18 +5323,32 @@ var $elm$html$Html$Events$targetValue = A2(
 	_List_fromArray(
 		['target', 'value']),
 	$elm$json$Json$Decode$string);
+var $elm$html$Html$Events$onInput = function (tagger) {
+	return A2(
+		$elm$html$Html$Events$stopPropagationOn,
+		'input',
+		A2(
+			$elm$json$Json$Decode$map,
+			$elm$html$Html$Events$alwaysStop,
+			A2($elm$json$Json$Decode$map, tagger, $elm$html$Html$Events$targetValue)));
+};
+var $elm$html$Html$Attributes$placeholder = $elm$html$Html$Attributes$stringProperty('placeholder');
+var $elm$html$Html$span = _VirtualDom_node('span');
+var $author$project$Main$ChangeCheck = function (a) {
+	return {$: 'ChangeCheck', a: a};
+};
+var $elm$html$Html$li = _VirtualDom_node('li');
 var $elm_community$html_extra$Html$Events$Extra$onChange = function (onChangeAction) {
 	return A2(
 		$elm$html$Html$Events$on,
 		'change',
 		A2($elm$json$Json$Decode$map, onChangeAction, $elm$html$Html$Events$targetValue));
 };
-var $elm$html$Html$span = _VirtualDom_node('span');
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
 var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
 var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
-var $author$project$Main$createList = function (task) {
+var $author$project$Main$taskList = function (task) {
 	return A2(
 		$elm$html$Html$li,
 		_List_Nil,
@@ -5329,35 +5389,6 @@ var $author$project$Main$createList = function (task) {
 					]))
 			]));
 };
-var $elm$html$Html$Events$onClick = function (msg) {
-	return A2(
-		$elm$html$Html$Events$on,
-		'click',
-		$elm$json$Json$Decode$succeed(msg));
-};
-var $elm$html$Html$Events$alwaysStop = function (x) {
-	return _Utils_Tuple2(x, true);
-};
-var $elm$virtual_dom$VirtualDom$MayStopPropagation = function (a) {
-	return {$: 'MayStopPropagation', a: a};
-};
-var $elm$html$Html$Events$stopPropagationOn = F2(
-	function (event, decoder) {
-		return A2(
-			$elm$virtual_dom$VirtualDom$on,
-			event,
-			$elm$virtual_dom$VirtualDom$MayStopPropagation(decoder));
-	});
-var $elm$html$Html$Events$onInput = function (tagger) {
-	return A2(
-		$elm$html$Html$Events$stopPropagationOn,
-		'input',
-		A2(
-			$elm$json$Json$Decode$map,
-			$elm$html$Html$Events$alwaysStop,
-			A2($elm$json$Json$Decode$map, tagger, $elm$html$Html$Events$targetValue)));
-};
-var $elm$html$Html$Attributes$placeholder = $elm$html$Html$Attributes$stringProperty('placeholder');
 var $elm$html$Html$ul = _VirtualDom_node('ul');
 var $author$project$Main$view = function (model) {
 	return A2(
@@ -5393,7 +5424,67 @@ var $author$project$Main$view = function (model) {
 				A2(
 				$elm$html$Html$ul,
 				_List_Nil,
-				A2($elm$core$List$map, $author$project$Main$createList, model.todoList))
+				(model.viewSelected === 'All') ? A2($elm$core$List$map, $author$project$Main$taskList, model.allTasks) : ((model.viewSelected === 'ToDo') ? A2($elm$core$List$map, $author$project$Main$taskList, model.toDoList) : A2($elm$core$List$map, $author$project$Main$taskList, model.doneList))),
+				($elm$core$List$length(model.allTasks) > 0) ? A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('footer')
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$span,
+						_List_fromArray(
+							[
+								$elm$html$Html$Events$onClick(
+								$author$project$Main$ChangeView('All')),
+								$elm$html$Html$Attributes$classList(
+								_List_fromArray(
+									[
+										_Utils_Tuple2('footer-item', true),
+										_Utils_Tuple2('footer-item_active', model.viewSelected === 'All')
+									]))
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('All')
+							])),
+						A2(
+						$elm$html$Html$span,
+						_List_fromArray(
+							[
+								$elm$html$Html$Events$onClick(
+								$author$project$Main$ChangeView('ToDo')),
+								$elm$html$Html$Attributes$classList(
+								_List_fromArray(
+									[
+										_Utils_Tuple2('footer-item', true),
+										_Utils_Tuple2('footer-item_active', model.viewSelected === 'ToDo')
+									]))
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('ToDo')
+							])),
+						A2(
+						$elm$html$Html$span,
+						_List_fromArray(
+							[
+								$elm$html$Html$Events$onClick(
+								$author$project$Main$ChangeView('Done')),
+								$elm$html$Html$Attributes$classList(
+								_List_fromArray(
+									[
+										_Utils_Tuple2('footer-item', true),
+										_Utils_Tuple2('footer-item_active', model.viewSelected === 'Done')
+									]))
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Done')
+							]))
+					])) : A2($elm$html$Html$div, _List_Nil, _List_Nil)
 			]));
 };
 var $author$project$Main$main = $elm$browser$Browser$sandbox(
