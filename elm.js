@@ -5172,6 +5172,7 @@ var $elm$browser$Browser$sandbox = function (impl) {
 			view: impl.view
 		});
 };
+var $elm$core$Basics$neq = _Utils_notEqual;
 var $author$project$Main$checkList = F2(
 	function (element, val) {
 		return (_Utils_eq(element.text, val) && element.checked) ? _Utils_update(
@@ -5179,6 +5180,19 @@ var $author$project$Main$checkList = F2(
 			{checked: false}) : ((_Utils_eq(element.text, val) && (!element.checked)) ? _Utils_update(
 			element,
 			{checked: true}) : element);
+	});
+var $author$project$Main$updateAll = F2(
+	function (val, model) {
+		return _Utils_update(
+			model,
+			{
+				allTasks: A2(
+					$elm$core$List$map,
+					function (n) {
+						return A2($author$project$Main$checkList, n, val);
+					},
+					model.allTasks)
+			});
 	});
 var $elm$core$List$filter = F2(
 	function (isGood, list) {
@@ -5191,7 +5205,24 @@ var $elm$core$List$filter = F2(
 			_List_Nil,
 			list);
 	});
-var $elm$core$Basics$neq = _Utils_notEqual;
+var $author$project$Main$updateLists = function (oldModel) {
+	return _Utils_update(
+		oldModel,
+		{
+			doneList: A2(
+				$elm$core$List$filter,
+				function (n) {
+					return n.checked;
+				},
+				oldModel.allTasks),
+			toDoList: A2(
+				$elm$core$List$filter,
+				function (n) {
+					return !n.checked;
+				},
+				oldModel.allTasks)
+		});
+};
 var $author$project$Main$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
@@ -5218,30 +5249,8 @@ var $author$project$Main$update = F2(
 					});
 			case 'ChangeCheck':
 				var value = msg.a;
-				return _Utils_update(
-					model,
-					{
-						allTasks: A2(
-							$elm$core$List$map,
-							function (n) {
-								return A2($author$project$Main$checkList, n, value);
-							},
-							model.allTasks),
-						doneList: _Utils_ap(
-							model.doneList,
-							A2(
-								$elm$core$List$filter,
-								function (n) {
-									return _Utils_eq(n.text, value);
-								},
-								model.doneList)),
-						toDoList: A2(
-							$elm$core$List$filter,
-							function (n) {
-								return !_Utils_eq(n.text, value);
-							},
-							model.toDoList)
-					});
+				return $author$project$Main$updateLists(
+					A2($author$project$Main$updateAll, value, model));
 			default:
 				var current = msg.a;
 				return _Utils_update(
@@ -5346,6 +5355,9 @@ var $elm_community$html_extra$Html$Events$Extra$onChange = function (onChangeAct
 };
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
+var $author$project$Main$toString = function (bool) {
+	return bool ? 'True' : 'False';
+};
 var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
 var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
 var $author$project$Main$taskList = function (task) {
@@ -5385,6 +5397,14 @@ var $author$project$Main$taskList = function (task) {
 						_List_fromArray(
 							[
 								$elm$html$Html$text(task.text)
+							])),
+						A2(
+						$elm$html$Html$span,
+						_List_Nil,
+						_List_fromArray(
+							[
+								$elm$html$Html$text(
+								$author$project$Main$toString(task.checked))
 							]))
 					]))
 			]));

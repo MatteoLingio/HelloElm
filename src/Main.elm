@@ -46,11 +46,20 @@ update msg model =
         ChangeTaskText text ->
            { model | task = { text = text, checked = False } } 
         ChangeCheck value ->
-           { model | allTasks = List.map (\n -> checkList n value) model.allTasks
-                    , doneList = model.doneList ++ List.filter(\n -> n.text == value) model.doneList
-                    , toDoList = List.filter(\n -> n.text /= value) model.toDoList }
+           updateAll value model |> updateLists
         ChangeView current -> 
             { model | viewSelected = current }
+
+updateAll: String -> Model -> Model
+
+updateAll val model =
+   { model | allTasks = List.map (\n -> checkList n val) model.allTasks }
+
+updateLists: Model -> Model
+updateLists oldModel = 
+    { oldModel |  doneList = List.filter(\n -> n.checked == True) oldModel.allTasks
+                 ,toDoList = List.filter(\n -> n.checked == False) oldModel.allTasks }
+
 checkList: Task -> String -> Task
 
 checkList element val = 
@@ -61,13 +70,22 @@ checkList element val =
     else
         element
 
+toString : Bool -> String
+toString bool =
+    if bool then
+        "True"
+
+    else
+        "False"
+
 taskList: Task -> Html Msg
 taskList task = 
     li[][ div[class "task-container"][
         input[class "switch", type_ "checkbox", value task.text, onChange ChangeCheck ][]
         ,span[classList [
             ( "checked", task.checked )
-          ]][text task.text]] ]
+          ]][text task.text]
+        ,span[][text (toString task.checked)]] ]
 
 view : Model -> Html Msg
 
