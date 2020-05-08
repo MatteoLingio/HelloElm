@@ -5169,23 +5169,45 @@ var $elm$browser$Browser$sandbox = function (impl) {
 			view: impl.view
 		});
 };
+var $author$project$Main$checkList = F2(
+	function (element, val) {
+		return (_Utils_eq(element.text, val) && element.checked) ? _Utils_update(
+			element,
+			{checked: false}) : ((_Utils_eq(element.text, val) && (!element.checked)) ? _Utils_update(
+			element,
+			{checked: true}) : element);
+	});
+var $elm$core$Basics$neq = _Utils_notEqual;
 var $author$project$Main$update = F2(
 	function (msg, model) {
-		if (msg.$ === 'Add') {
-			return {
-				task: {checked: false, text: ''},
-				todoList: _Utils_ap(
-					model.todoList,
-					_List_fromArray(
-						[model.task]))
-			};
-		} else {
-			var text = msg.a;
-			return _Utils_update(
-				model,
-				{
-					task: {checked: false, text: text}
-				});
+		switch (msg.$) {
+			case 'Add':
+				return (model.task.text !== '') ? {
+					task: {checked: false, text: ''},
+					todoList: _Utils_ap(
+						model.todoList,
+						_List_fromArray(
+							[model.task]))
+				} : model;
+			case 'ChangeTaskText':
+				var text = msg.a;
+				return _Utils_update(
+					model,
+					{
+						task: {checked: false, text: text}
+					});
+			default:
+				var value = msg.a;
+				return _Utils_update(
+					model,
+					{
+						todoList: A2(
+							$elm$core$List$map,
+							function (n) {
+								return A2($author$project$Main$checkList, n, value);
+							},
+							model.todoList)
+					});
 		}
 	});
 var $author$project$Main$Add = {$: 'Add'};
@@ -5202,12 +5224,70 @@ var $elm$html$Html$Attributes$stringProperty = F2(
 			$elm$json$Json$Encode$string(string));
 	});
 var $elm$html$Html$Attributes$class = $elm$html$Html$Attributes$stringProperty('className');
+var $author$project$Main$ChangeCheck = function (a) {
+	return {$: 'ChangeCheck', a: a};
+};
+var $elm$core$List$filter = F2(
+	function (isGood, list) {
+		return A3(
+			$elm$core$List$foldr,
+			F2(
+				function (x, xs) {
+					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
+				}),
+			_List_Nil,
+			list);
+	});
+var $elm$core$Tuple$second = function (_v0) {
+	var y = _v0.b;
+	return y;
+};
+var $elm$html$Html$Attributes$classList = function (classes) {
+	return $elm$html$Html$Attributes$class(
+		A2(
+			$elm$core$String$join,
+			' ',
+			A2(
+				$elm$core$List$map,
+				$elm$core$Tuple$first,
+				A2($elm$core$List$filter, $elm$core$Tuple$second, classes))));
+};
 var $elm$html$Html$div = _VirtualDom_node('div');
 var $elm$html$Html$input = _VirtualDom_node('input');
 var $elm$html$Html$li = _VirtualDom_node('li');
+var $elm$virtual_dom$VirtualDom$Normal = function (a) {
+	return {$: 'Normal', a: a};
+};
+var $elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
+var $elm$html$Html$Events$on = F2(
+	function (event, decoder) {
+		return A2(
+			$elm$virtual_dom$VirtualDom$on,
+			event,
+			$elm$virtual_dom$VirtualDom$Normal(decoder));
+	});
+var $elm$json$Json$Decode$field = _Json_decodeField;
+var $elm$json$Json$Decode$at = F2(
+	function (fields, decoder) {
+		return A3($elm$core$List$foldr, $elm$json$Json$Decode$field, decoder, fields);
+	});
+var $elm$json$Json$Decode$string = _Json_decodeString;
+var $elm$html$Html$Events$targetValue = A2(
+	$elm$json$Json$Decode$at,
+	_List_fromArray(
+		['target', 'value']),
+	$elm$json$Json$Decode$string);
+var $elm_community$html_extra$Html$Events$Extra$onChange = function (onChangeAction) {
+	return A2(
+		$elm$html$Html$Events$on,
+		'change',
+		A2($elm$json$Json$Decode$map, onChangeAction, $elm$html$Html$Events$targetValue));
+};
+var $elm$html$Html$span = _VirtualDom_node('span');
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
 var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
+var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
 var $author$project$Main$createList = function (task) {
 	return A2(
 		$elm$html$Html$li,
@@ -5227,24 +5307,28 @@ var $author$project$Main$createList = function (task) {
 						_List_fromArray(
 							[
 								$elm$html$Html$Attributes$class('switch'),
-								$elm$html$Html$Attributes$type_('checkbox')
+								$elm$html$Html$Attributes$type_('checkbox'),
+								$elm$html$Html$Attributes$value(task.text),
+								$elm_community$html_extra$Html$Events$Extra$onChange($author$project$Main$ChangeCheck)
 							]),
 						_List_Nil),
-						$elm$html$Html$text(task.text)
+						A2(
+						$elm$html$Html$span,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$classList(
+								_List_fromArray(
+									[
+										_Utils_Tuple2('checked', task.checked)
+									]))
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text(task.text)
+							]))
 					]))
 			]));
 };
-var $elm$virtual_dom$VirtualDom$Normal = function (a) {
-	return {$: 'Normal', a: a};
-};
-var $elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
-var $elm$html$Html$Events$on = F2(
-	function (event, decoder) {
-		return A2(
-			$elm$virtual_dom$VirtualDom$on,
-			event,
-			$elm$virtual_dom$VirtualDom$Normal(decoder));
-	});
 var $elm$html$Html$Events$onClick = function (msg) {
 	return A2(
 		$elm$html$Html$Events$on,
@@ -5264,17 +5348,6 @@ var $elm$html$Html$Events$stopPropagationOn = F2(
 			event,
 			$elm$virtual_dom$VirtualDom$MayStopPropagation(decoder));
 	});
-var $elm$json$Json$Decode$field = _Json_decodeField;
-var $elm$json$Json$Decode$at = F2(
-	function (fields, decoder) {
-		return A3($elm$core$List$foldr, $elm$json$Json$Decode$field, decoder, fields);
-	});
-var $elm$json$Json$Decode$string = _Json_decodeString;
-var $elm$html$Html$Events$targetValue = A2(
-	$elm$json$Json$Decode$at,
-	_List_fromArray(
-		['target', 'value']),
-	$elm$json$Json$Decode$string);
 var $elm$html$Html$Events$onInput = function (tagger) {
 	return A2(
 		$elm$html$Html$Events$stopPropagationOn,
@@ -5284,6 +5357,7 @@ var $elm$html$Html$Events$onInput = function (tagger) {
 			$elm$html$Html$Events$alwaysStop,
 			A2($elm$json$Json$Decode$map, tagger, $elm$html$Html$Events$targetValue)));
 };
+var $elm$html$Html$Attributes$placeholder = $elm$html$Html$Attributes$stringProperty('placeholder');
 var $elm$html$Html$ul = _VirtualDom_node('ul');
 var $author$project$Main$view = function (model) {
 	return A2(
@@ -5299,7 +5373,9 @@ var $author$project$Main$view = function (model) {
 				_List_fromArray(
 					[
 						$elm$html$Html$Attributes$type_('text'),
-						$elm$html$Html$Events$onInput($author$project$Main$ChangeTaskText)
+						$elm$html$Html$Events$onInput($author$project$Main$ChangeTaskText),
+						$elm$html$Html$Attributes$value(model.task.text),
+						$elm$html$Html$Attributes$placeholder('Add a new task')
 					]),
 				_List_Nil),
 				A2($elm$html$Html$div, _List_Nil, _List_Nil),

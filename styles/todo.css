@@ -9,6 +9,10 @@ body {
     outline: none;
 }
 
+.checked{
+    text-decoration: line-through;
+}
+
 .container {
   margin: 0;
   display: flex;
