@@ -1,0 +1,89 @@
+@import url("https://fonts.googleapis.com/css?family=Open+Sans&display=swap");
+
+body {
+  background-color: #282828;
+  color: hsla(0, 0%, 100%, 0.87);
+  font-family: "Open Sans", sans-serif;
+}
+*:focus {
+    outline: none;
+}
+
+.container {
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  padding: 30px;
+}
+
+ul {
+  list-style: none;
+}
+
+input[type="text"] {
+  width: 20%;
+  padding: 8px 8px;
+  margin: 8px 0;
+  box-sizing: border-box;
+  background-color: #282828;
+  border: 1px solid hsla(0, 0%, 100%, 0.87);
+  caret-color: hsla(0, 0%, 100%, 0.87);
+  color: hsla(0, 0%, 100%, 0.87);
+  font-size: 15px;
+}
+
+button {
+  background-color: #de4c4a;
+  border: none;
+  color: white;
+  padding: 10px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 20px 2px;
+  cursor: pointer;
+}
+
+.task-container {
+  display: flex;
+  padding: 15px;
+  min-width: 500px;
+  border-bottom: solid 1px lightgrey;
+  align-items: center;
+}
+
+@supports (-webkit-appearance: none) or (-moz-appearance: none) {
+  input[type="checkbox"],
+  input[type="radio"] {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+  }
+
+  input[type="checkbox"] {
+    color: #f2f2f2;
+  }
+
+  input[type="checkbox"] {
+    display: inline-block;
+    width: 19px;
+    height: 19px;
+    margin: -2px 10px 0 0;
+    vertical-align: middle;
+    /* background: url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/210284/check_radio_sheet.png)
+      left top no-repeat; */
+    border: 2px solid #de4c4a;
+    cursor: pointer;
+    border-radius: 50%;
+  }
+
+  input[type="checkbox"]:checked {
+    /* background: url(https://toppng.com/uploads/preview/vector-freeuse-library-check-mark-svg-icon-free-check-svg-icon-11553510507mtgxxypfzx.png)
+      3px center no-repeat; */
+    background: url(../assets/check.svg)
+      3px center no-repeat;
+    background-size: 10px 10px;
+  }
+}

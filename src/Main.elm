@@ -4,7 +4,7 @@ import Browser
 import Html exposing (..)
 import Html.Events exposing (onClick, onInput)
 import Debug exposing(log)
-import Html.Attributes exposing (type_, checked, value)
+import Html.Attributes exposing (type_, checked, value, class)
 
 main = Browser.sandbox {init = init, update = update, view = view}
 
@@ -39,15 +39,15 @@ update msg model =
 
 createList: Task -> Html Msg
 createList task = 
-    li[][ div[][
-        input[ type_ "checkbox" ][]
+    li[][ div[class "task-container"][
+        input[class "switch", type_ "checkbox" ][]
         ,text task.text] ]
 
 view : Model -> Html Msg
 
 view model =
-  div [][ 
-      input[ onInput ChangeTaskText ][]
+  div [class "container"][ 
+      input[ type_ "text", onInput ChangeTaskText ][]
       ,div[][]
       ,button [ onClick Add ] [ text "Add Task" ]
       ,div[][]
@@ -55,3 +55,5 @@ view model =
         (List.map createList model.todoList)
       ]
 
+
+--Styles 
